@@ -1,0 +1,187 @@
+Given a binary tree of size N, your task is to that find all duplicate subtrees from the given binary tree.
+
+Note: Here's the Output of every Node printed in the Pre-Order tree traversal format. Arrange nodes in the answer array based on the lexicographically incresing order of their preorder traversal of subtree.
+For Example: if we have 3 preorder traversal as {1,2,3},{1},{11,2,3} than your lexicographically increasing order is {1},{1,2,3},{11,2,3}, you are supposed to output the head of all these subtrees in the same order.
+
+Example:
+
+Input : 
+
+Output : 2 4
+         4
+Explanation: Above Trees are two 
+duplicate subtrees.i.e  and 
+Therefore,you need to return above trees 
+root in the form of a list.
+Your Task:
+You don't need to take input. Just complete the function printAllDups() that takes the root node as a parameter and returns an array of Node*, which contains all the duplicate subtree.
+
+
+Constraints:
+1<=T<=100
+1<=N<=100
+
+
+code::::::::
+
+
+//{ Driver Code Starts
+//Initial Template for Java
+
+import java.io.*;
+import java.util.*;
+import java.lang.*; 
+
+
+class Node {
+    int data;
+    Node left, right;
+    
+    public Node(int data){
+        this.data = data;
+    }
+}
+
+class GFG {
+    
+    
+    static Node buildTree(String str){
+        
+        if(str.length()==0 || str.charAt(0)=='N'){
+            return null;
+        }
+        
+        String ip[] = str.split(" ");
+        // Create the root of the tree
+        Node root = new Node(Integer.parseInt(ip[0]));
+        // Push the root to the queue
+        
+        Queue<Node> queue = new LinkedList<>(); 
+        
+        queue.add(root);
+        // Starting from the second element
+        
+        int i = 1;
+        while(queue.size()>0 && i < ip.length) {
+            
+            // Get and remove the front of the queue
+            Node currNode = queue.peek();
+            queue.remove();
+                
+            // Get the current node's value from the string
+            String currVal = ip[i];
+                
+            // If the left child is not null
+            if(!currVal.equals("N")) {
+                    
+                // Create the left child for the current node
+                currNode.left = new Node(Integer.parseInt(currVal));
+                // Push it to the queue
+                queue.add(currNode.left);
+            }
+                
+            // For the right child
+            i++;
+            if(i >= ip.length)
+                break;
+                
+            currVal = ip[i];
+                
+            // If the right child is not null
+            if(!currVal.equals("N")) {
+                    
+                // Create the right child for the current node
+                currNode.right = new Node(Integer.parseInt(currVal));
+                    
+                // Push it to the queue
+                queue.add(currNode.right);
+            }
+            i++;
+        }
+        
+        return root;
+    }
+    public static void preorder(Node root){
+        if(root == null)
+            return;
+        System.out.print(root.data+" ");
+        preorder(root.left);
+        preorder(root.right);
+    }
+    
+	public static void main (String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int t=Integer.parseInt(br.readLine());
+		while(t-- > 0){
+		    String s = br.readLine();
+	    	Node root = buildTree(s);
+		    Solution obj = new Solution();
+		    List<Node> res = obj.printAllDups(root);
+		    for(int i = 0;i<res.size();i++){
+		        preorder(res.get(i));
+		        System.out.println();
+		    }
+		    
+		}
+	}
+}
+
+// } Driver Code Ends
+
+
+//User function Template for Java
+
+/*
+class Node {
+    int data;
+    Node left, right;
+    
+    public Node(int data){
+        this.data = data;
+    }
+}
+*/
+class Solution{
+    static HashMap<String,Integer> m;
+    static ArrayList<Node> list;
+    public List<Node> printAllDups(Node root)
+    {
+       //code here
+       m = new HashMap<>();
+       list = new ArrayList<>();
+       solve(root);
+       Collections.sort(list,new Comparator<Node>(){
+           @Override
+           public int compare(Node o1,Node o2){
+               if(o1.data==o2.data){
+                   return 0;
+               }else if(o1.data>o2.data){
+                   return 1;
+               }else{
+                   return -1;
+               }
+           }
+       });
+       return list;
+    }
+    public String solve(Node root){
+        if(root == null){
+            return "";
+        }
+        String str = "(";
+        str += solve(root.left);
+        str += solve(root.right);
+        str += String.valueOf(root.data);
+        str += ")";
+        if(m.get(str)!=null && m.get(str)==1){
+            list.add(root);
+        }
+        if(m.containsKey(str)){
+            m.put(str,m.get(str)+1);
+        }else{
+            m.put(str,1);
+        }
+        return str;
+    }
+}
+
